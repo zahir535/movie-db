@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { Pressable, ScrollView, View, ViewStyle } from "react-native";
+import { Pressable, ScrollView, Text, View, ViewStyle } from "react-native";
 import Modal from "react-native-modal";
+import Icon from "react-native-vector-icons/Entypo";
 
 import { Container } from "../components/container";
 import { Search } from "../components/input";
@@ -12,8 +13,10 @@ export const Dashboard = () => {
   const [data, setData] = useState<IDataItem[]>([]);
   const [searchText, setSearchText] = useState("");
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
 
   const [showDetail, setShowDetail] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<IDataItem | undefined>(undefined);
 
   // console.log("data", {
   //   DUMMY_DATA: DUMMY_DATA,
@@ -34,6 +37,9 @@ export const Dashboard = () => {
     setShowDetail(false);
   };
 
+  const handleNextPage = () => {};
+  const handlePrevPage = () => {};
+
   const itemStyles: ViewStyle = {
     // marginTop: 40,
     flexWrap: "wrap",
@@ -45,6 +51,7 @@ export const Dashboard = () => {
 
   const searchStyles: ViewStyle = {
     marginBottom: 20,
+    marginRight: 16,
   };
 
   useEffect(() => {
@@ -53,8 +60,15 @@ export const Dashboard = () => {
 
   return (
     <Container>
-      <View>
+      <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center" }}>
         <Search onPress={handleSearch} value={query} onChangeText={setQuery} viewStyle={searchStyles} />
+        <Pressable onPress={handlePrevPage}>
+          <Icon name="chevron-left" size={30} color="#900" />
+        </Pressable>
+        <Text style={{ color: "white" }}>{page}</Text>
+        <Pressable onPress={handleNextPage}>
+          <Icon name="chevron-right" size={30} color="#900" />
+        </Pressable>
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <View style={itemStyles}>
@@ -65,6 +79,7 @@ export const Dashboard = () => {
 
               const handleOpenItem = () => {
                 setShowDetail(true);
+                setSelectedItem(item);
                 console.log("handleOpenItem run", title);
               };
 
@@ -80,7 +95,7 @@ export const Dashboard = () => {
       </ScrollView>
 
       <Modal isVisible={showDetail}>
-        <ShowDetails setVisible={handleCloseDetails} />
+        <ShowDetails setVisible={handleCloseDetails} data={selectedItem} />
       </Modal>
     </Container>
   );
