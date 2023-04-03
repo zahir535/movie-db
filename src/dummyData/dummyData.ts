@@ -252,16 +252,16 @@ export const DUMMY_DATA = {
       popularity: 61.91,
     },
     {
-      adult: false,
+      adult: true, //
       backdrop_path: "/5a7lMDn3nAj2ByO0X1fg6BhUphR.jpg",
       genre_ids: [12, 14, 878],
       id: 333339,
-      original_language: "en",
+      original_language: "en", //
       original_title: "Ready Player One",
-      overview: "When the creator of a popular video game system dies, a virtual contest is created to compete for his fortune.",
+      overview: "When the creator of a popular video game system dies, a virtual contest is created to compete for his fortune.", //
       poster_path: "/pU1ULUq8D3iRxl1fdX2lZIzdHuI.jpg",
       release_date: "2018-03-28",
-      title: "Ready Player One",
+      title: "Ready Player One", //
       video: false,
       vote_average: 7.7,
       vote_count: 3673,
@@ -301,7 +301,7 @@ export const DUMMY_DATA = {
       popularity: 44.477,
     },
     {
-      adult: false,
+      adult: true,
       backdrop_path: "/bLJTjfbZ1c5zSNiAvGYs1Uc82ir.jpg",
       genre_ids: [28, 12, 14],
       id: 338970,
