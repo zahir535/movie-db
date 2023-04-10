@@ -30,7 +30,7 @@ export const Title: FunctionComponent<ITitle> = ({ label, subLabel_1, subLabel_2
     <View>
       <Text style={labelStyle}>{label}</Text>
 
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
         {subLabel_1 !== undefined ? (
           <Fragment>
             <Text style={subLabelStyle}>{subLabel_1}</Text>
