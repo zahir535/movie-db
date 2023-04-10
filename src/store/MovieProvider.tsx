@@ -11,10 +11,16 @@ interface IReview {
   review: string;
 }
 
+interface IGenre {
+  id: number;
+  name: string;
+}
+
 interface IContextState {
   watchList: string[];
   profile: IProfile;
   review: IReview[];
+  genre: IGenre[];
 }
 
 export interface IMovieContext {
@@ -22,6 +28,7 @@ export interface IMovieContext {
   handleUpdateWatchList: (value: string) => void;
   handleUpdateProfile: (value: IProfile) => void;
   handleAddReview: (value: IReview) => void;
+  handleUpdateGenre: (value: IGenre[]) => void;
 }
 
 interface IMovieProvider {
@@ -36,6 +43,7 @@ const initialState: IContextState = {
     key: "",
   },
   review: [],
+  genre: [],
 };
 
 export const MovieContext = createContext<IMovieContext>({
@@ -43,6 +51,7 @@ export const MovieContext = createContext<IMovieContext>({
   handleUpdateWatchList: () => {},
   handleUpdateProfile: () => {},
   handleAddReview: () => {},
+  handleUpdateGenre: () => {},
 });
 
 const { Provider } = MovieContext;
@@ -76,5 +85,11 @@ export const MovieProvider: FunctionComponent<IMovieProvider> = ({ children }: I
     setContextState({ ...contextState, review: updatedReview });
   };
 
-  return <Provider value={{ contextState, handleUpdateWatchList, handleUpdateProfile, handleAddReview }}>{children}</Provider>;
+  const handleUpdateGenre = (value: IGenre[]) => {
+    setContextState({ ...contextState, genre: value });
+  };
+
+  return (
+    <Provider value={{ contextState, handleUpdateWatchList, handleUpdateProfile, handleAddReview, handleUpdateGenre }}>{children}</Provider>
+  );
 };
