@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View, ViewStyle } from "react-native";
 import Modal from "react-native-modal";
 import Icon from "react-native-vector-icons/Entypo";
@@ -7,38 +7,35 @@ import { Container } from "../components/container";
 import { Search } from "../components/input";
 import { ShowDetails } from "../components/modal";
 import { ItemView } from "../components/view";
-import { DUMMY_DATA } from "../dummyData/dummyData";
+import { fetchGenreData, trendingDataDashboard } from "../network";
+import { MovieContext } from "../store";
 
-export const Dashboard = () => {
+export const Dashboard = ({ navigation }) => {
   const [data, setData] = useState<IDataItem[]>([]);
-  const [searchText, setSearchText] = useState("");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
 
   const [showDetail, setShowDetail] = useState(false);
   const [selectedItem, setSelectedItem] = useState<IDataItem | undefined>(undefined);
 
-  // console.log("data", {
-  //   DUMMY_DATA: DUMMY_DATA,
-  //   data: data,
-  // });
+  const { handleUpdateGenre } = useContext(MovieContext);
 
-  const handleFetch = () => {
-    setData(DUMMY_DATA.results);
-  };
-
-  const handleSearch = () => {
-    if (query !== "") {
-      setSearchText(query);
-    }
+  const handleFetch = async () => {
+    setData(await trendingDataDashboard());
+    handleUpdateGenre(await fetchGenreData());
   };
 
   const handleCloseDetails = () => {
     setShowDetail(false);
   };
 
+  const handleLogOut = () => {
+    navigation.goBack();
+  };
+
   const handleNextPage = () => {};
   const handlePrevPage = () => {};
+  const handleSearch = () => {};
 
   const itemStyles: ViewStyle = {
     // marginTop: 40,
@@ -62,6 +59,7 @@ export const Dashboard = () => {
     <Container>
       <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center" }}>
         <Search onPress={handleSearch} value={query} onChangeText={setQuery} viewStyle={searchStyles} />
+
         <Pressable onPress={handlePrevPage}>
           <Icon name="chevron-left" size={30} color="#900" />
         </Pressable>
@@ -69,34 +67,40 @@ export const Dashboard = () => {
         <Pressable onPress={handleNextPage}>
           <Icon name="chevron-right" size={30} color="#900" />
         </Pressable>
+
+        <Pressable onPress={handleLogOut}>
+          <Icon name="network" size={30} color="white" />
+        </Pressable>
       </View>
+
       <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <View style={itemStyles}>
           {data
             .filter((item) => item.title !== undefined && item.title.toLowerCase().includes(query.toLowerCase()))
             .map((item, index) => {
-              const { title, popularity } = item;
+              const { title, popularity, poster_path, backdrop_path } = item;
 
               const handleOpenItem = () => {
                 setShowDetail(true);
                 setSelectedItem(item);
-                console.log("handleOpenItem run", title);
               };
-
-              const defaultImage = "../../dummyData/movie-cover.jpeg";
 
               return (
                 <Pressable key={index} onPress={handleOpenItem}>
-                  <ItemView image={defaultImage} title={title} />
+                  <ItemView image={poster_path} title={title} />
                 </Pressable>
               );
             })}
         </View>
       </ScrollView>
 
-      <Modal isVisible={showDetail}>
-        <ShowDetails setVisible={handleCloseDetails} data={selectedItem} />
-      </Modal>
+      {selectedItem !== undefined ? (
+        <Fragment>
+          <Modal isVisible={showDetail}>
+            <ShowDetails setVisible={handleCloseDetails} data={selectedItem} />
+          </Modal>
+        </Fragment>
+      ) : null}
     </Container>
   );
 };
