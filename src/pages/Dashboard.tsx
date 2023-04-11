@@ -8,7 +8,7 @@ import { Search } from "../components/input";
 import { ShowDetails } from "../components/modal";
 import { ItemView } from "../components/view";
 import { fetchGenreData, trendingDataDashboard } from "../network";
-import { MovieContext } from "../store";
+import { GlobalContext, MovieContext } from "../store";
 
 export const Dashboard = ({ navigation }) => {
   const [data, setData] = useState<IDataItem[]>([]);
@@ -19,8 +19,10 @@ export const Dashboard = ({ navigation }) => {
   const [selectedItem, setSelectedItem] = useState<IDataItem | undefined>(undefined);
 
   const { handleUpdateGenre } = useContext(MovieContext);
+  const { handleResetGlobal } = useContext(GlobalContext);
 
   const handleFetch = async () => {
+    // todo - no error handling for network yet
     setData(await trendingDataDashboard());
     handleUpdateGenre(await fetchGenreData());
   };
@@ -30,6 +32,7 @@ export const Dashboard = ({ navigation }) => {
   };
 
   const handleLogOut = () => {
+    handleResetGlobal();
     navigation.goBack();
   };
 
@@ -38,12 +41,9 @@ export const Dashboard = ({ navigation }) => {
   const handleSearch = () => {};
 
   const itemStyles: ViewStyle = {
-    // marginTop: 40,
     flexWrap: "wrap",
     flexDirection: "row",
-    // justifyContent: "space-around",
     justifyContent: "flex-start",
-    // backgroundColor: "black",
   };
 
   const searchStyles: ViewStyle = {
@@ -78,7 +78,7 @@ export const Dashboard = ({ navigation }) => {
           {data
             .filter((item) => item.title !== undefined && item.title.toLowerCase().includes(query.toLowerCase()))
             .map((item, index) => {
-              const { title, popularity, poster_path, backdrop_path } = item;
+              const { title, poster_path } = item;
 
               const handleOpenItem = () => {
                 setShowDetail(true);

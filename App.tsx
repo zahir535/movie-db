@@ -4,6 +4,7 @@ import { SafeAreaView, StatusBar, useColorScheme } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
 import { PublicStack } from "./src/navigation/PublicStack";
+import { GlobalProvider } from "./src/store";
 import { MovieProvider } from "./src/store/MovieProvider";
 
 function App(): JSX.Element {
@@ -15,14 +16,16 @@ function App(): JSX.Element {
   };
 
   return (
-    <MovieProvider>
-      <NavigationContainer>
-        <SafeAreaView style={backgroundStyle}>
-          <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={backgroundStyle.backgroundColor} />
-        </SafeAreaView>
-        <PublicStack />
-      </NavigationContainer>
-    </MovieProvider>
+    <GlobalProvider>
+      <MovieProvider>
+        <NavigationContainer>
+          <SafeAreaView style={backgroundStyle}>
+            <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={backgroundStyle.backgroundColor} />
+          </SafeAreaView>
+          <PublicStack />
+        </NavigationContainer>
+      </MovieProvider>
+    </GlobalProvider>
   );
 }
 export default App;
