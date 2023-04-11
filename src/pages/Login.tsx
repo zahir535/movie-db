@@ -1,34 +1,32 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Alert, Text, ViewStyle } from "react-native";
 
 import { Container } from "../components/container";
 import { Input } from "../components/input";
 import { GeneralButton } from "../components/view";
-import { createSessionId } from "../network";
+import { createSessionId, getAccountId, getSessionToken, validateLogin } from "../network";
+import { GlobalContext } from "../store";
 
 export const Login = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPassword] = useState(false);
+  const { handleUpdateSessionIdAccountId } = useContext(GlobalContext);
 
   const handleLogin = async () => {
-    const loginResponse = await createSessionId();
+    if (username !== "" && password !== "") {
+      const token = await getSessionToken();
+      const validatedToken = await validateLogin(token);
+      const validatedSessionId = await createSessionId(validatedToken);
+      const accountId = await getAccountId(validatedSessionId);
+      // console.log("handleLogin", { token: token, validatedToken: validatedToken, validatedSessionId: validatedSessionId });
 
-    if (loginResponse.error === undefined) {
-      if (username !== "" && password !== "") {
-        navigation.navigate("Private");
-      } else {
-        Alert.alert("Invalid credentials");
-      }
+      // save to context
+      await handleUpdateSessionIdAccountId(validatedSessionId, accountId);
+      navigation.navigate("Private");
     } else {
-      Alert.alert(loginResponse.error.errorMessage);
+      Alert.alert("Invalid credentials");
     }
-  };
-
-  const updatedContainerStyle: ViewStyle = {
-    backgroundColor: "lightgreen",
-    justifyContent: "center",
-    alignItems: "center",
   };
 
   const handleUpdateSeePassword = () => {
@@ -41,6 +39,12 @@ export const Login = ({ navigation }) => {
 
   const handleUpdatePassword = (value: string) => {
     setPassword(value);
+  };
+
+  const updatedContainerStyle: ViewStyle = {
+    backgroundColor: "lightgreen",
+    justifyContent: "center",
+    alignItems: "center",
   };
 
   return (
