@@ -251,7 +251,9 @@ export const ShowDetails = ({ navigation }) => {
                 );
               })}
             </Fragment>
-          ) : null}
+          ) : (
+            <Text style={{ color: "white", fontWeight: "bold" }}>No review</Text>
+          )}
         </ScrollView>
       </View>
     </Fragment>

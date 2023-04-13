@@ -1,28 +1,31 @@
 import React, { useContext, useState } from "react";
-import { Alert, Text, ViewStyle } from "react-native";
+import { Alert, ViewStyle } from "react-native";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
 import { Container } from "../components/container";
 import { Input } from "../components/input";
-import { GeneralButton } from "../components/view";
+import { GeneralButton, Spacer } from "../components/view";
 import { createSessionId, getAccountId, getSessionToken, validateLogin } from "../network";
 import { GlobalContext } from "../store";
 
 export const Login = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showPass, setShowPassword] = useState(false);
+  const [showPass, setShowPassword] = useState(true);
   const { handleUpdateSessionIdAccountId } = useContext(GlobalContext);
 
   const handleLogin = async () => {
     if (username !== "" && password !== "") {
       const token = await getSessionToken();
-      const validatedToken = await validateLogin(token);
+      const validatedToken = await validateLogin(token, username, password);
       const validatedSessionId = await createSessionId(validatedToken);
       const accountId = await getAccountId(validatedSessionId);
-      // console.log("handleLogin", { token: token, validatedToken: validatedToken, validatedSessionId: validatedSessionId });
 
       // save to context
       await handleUpdateSessionIdAccountId(validatedSessionId, accountId);
+      setUsername("");
+      setPassword("");
+      setShowPassword(true);
       navigation.navigate("Private");
     } else {
       Alert.alert("Invalid credentials");
@@ -42,7 +45,7 @@ export const Login = ({ navigation }) => {
   };
 
   const updatedContainerStyle: ViewStyle = {
-    backgroundColor: "lightgreen",
+    backgroundColor: Colors.darker,
     justifyContent: "center",
     alignItems: "center",
   };
@@ -50,9 +53,16 @@ export const Login = ({ navigation }) => {
   return (
     <Container style={updatedContainerStyle}>
       <Input placeholder="username" value={username} onChangeText={handleUpdateUser} />
-      <Input placeholder="password" value={password} onChangeText={handleUpdatePassword} secureTextEntry={showPass} />
-      <Text onPress={handleUpdateSeePassword}>{showPass !== true ? "see password" : "hide password"}</Text>
-      <GeneralButton label={"Log In"} onPress={handleLogin} />
+      <Spacer space={8} />
+      <Input
+        placeholder="password"
+        value={password}
+        onChangeText={handleUpdatePassword}
+        secureTextEntry={showPass}
+        onShowPassword={handleUpdateSeePassword}
+        onShowValue={showPass}
+      />
+      <GeneralButton label={"Log In"} onPress={handleLogin} textStyle={{ color: "white" }} />
     </Container>
   );
 };
