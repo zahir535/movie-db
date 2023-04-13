@@ -1,15 +1,29 @@
 import React, { Fragment, FunctionComponent, useState } from "react";
-import { NativeSyntheticEvent, TextInput, TextInputFocusEventData, TextInputProps, TextStyle, View, ViewStyle } from "react-native";
+import {
+  NativeSyntheticEvent,
+  Pressable,
+  TextInput,
+  TextInputFocusEventData,
+  TextInputProps,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native";
+import Icon from "react-native-vector-icons/Entypo";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
 interface IInput extends TextInputProps {
   viewStyle?: ViewStyle;
+  onShowValue?: boolean;
+  onShowPassword?: () => void;
 }
 
 export const Input: FunctionComponent<IInput> = ({
   onBlur,
   onFocus,
   onLayout,
+  onShowPassword,
+  onShowValue,
   placeholder,
   style,
   testID,
@@ -39,34 +53,49 @@ export const Input: FunctionComponent<IInput> = ({
     setIsFocused(true);
   };
 
-  const inputStyle: TextStyle = {
-    // flex: 1,
+  const inputTextStyle: TextStyle = {
     color: Colors.darker,
     fontSize: 16,
-    height: isFocused ? 42 : 40, // height is more than the input view size to adjust the keyboard avoiding view
+    // backgroundColor: "lightgreen",
+    flex: 1,
+  };
+  const inputStyle: TextStyle = {
+    color: Colors.darker,
+    fontSize: 16,
+    height: 40, // height is more than the input view size to adjust the keyboard avoiding view
     backgroundColor: Colors.lighter,
     width: 200,
     borderWidth: 1,
     paddingHorizontal: 8,
-    marginTop: 16,
     borderRadius: 4,
+    // marginLeft: 16,
     ...viewStyle,
   };
 
   return (
     <View>
-      <TextInput
-        autoCorrect={false}
-        onBlur={handleBlur}
-        onFocus={handleFocus}
-        placeholder={placeholder}
-        placeholderTextColor={Colors.lightgreen}
-        // selectionColor={Colors.darker}
-        spellCheck={false}
-        style={inputStyle}
-        value={value}
-        {...props}
-      />
+      <View style={{ flexDirection: "row", alignItems: "center", ...inputStyle }}>
+        <TextInput
+          autoCorrect={false}
+          onBlur={handleBlur}
+          onFocus={handleFocus}
+          placeholder={placeholder}
+          placeholderTextColor={Colors.lightgreen}
+          // selectionColor={Colors.darker}
+          spellCheck={false}
+          style={inputTextStyle}
+          value={value}
+          // selectionColor={Colors.darker}
+          {...props}
+        />
+        {onShowPassword !== undefined && onShowValue !== undefined ? (
+          <Fragment>
+            <Pressable onPress={onShowPassword}>
+              <Icon name={onShowValue ? "eye-with-line" : "eye"} size={24} />
+            </Pressable>
+          </Fragment>
+        ) : null}
+      </View>
     </View>
   );
 };
