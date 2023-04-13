@@ -1,34 +1,32 @@
-import React, { Fragment, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View, ViewStyle } from "react-native";
-import Modal from "react-native-modal";
 import Icon from "react-native-vector-icons/Entypo";
 
 import { Container } from "../components/container";
 import { Search } from "../components/input";
-import { ShowDetails } from "../components/modal";
-import { ItemView } from "../components/view";
-import { fetchGenreData, trendingDataDashboard } from "../network";
+import { ItemView, Spacer } from "../components/view";
+import { fetchGenreData, getRating, trendingDataDashboard } from "../network";
 import { GlobalContext, MovieContext } from "../store";
 
 export const Dashboard = ({ navigation }) => {
-  const [data, setData] = useState<IDataItem[]>([]);
   const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
 
-  const [showDetail, setShowDetail] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<IDataItem | undefined>(undefined);
-
-  const { handleUpdateGenre } = useContext(MovieContext);
-  const { handleResetGlobal } = useContext(GlobalContext);
+  const { handleUpdateFetchDashboard, contextState, handleUpdatedSelectedItem } = useContext(MovieContext);
+  const { handleResetGlobal, globalState } = useContext(GlobalContext);
+  const { movie } = contextState;
+  const { sessionId, accountId } = globalState;
 
   const handleFetch = async () => {
     // todo - no error handling for network yet
-    setData(await trendingDataDashboard());
-    handleUpdateGenre(await fetchGenreData());
-  };
-
-  const handleCloseDetails = () => {
-    setShowDetail(false);
+    // setData(await trendingDataDashboard());
+    // handleUpdateMovie(await trendingDataDashboard());
+    // handleUpdateGenre(await fetchGenreData());
+    handleUpdateFetchDashboard(
+      await fetchGenreData(),
+      await trendingDataDashboard(),
+      await getRating({ sessionId: sessionId, accountId: parseInt(accountId) }),
+    );
   };
 
   const handleLogOut = () => {
@@ -36,9 +34,17 @@ export const Dashboard = ({ navigation }) => {
     navigation.goBack();
   };
 
-  const handleNextPage = () => {};
-  const handlePrevPage = () => {};
-  const handleSearch = () => {};
+  const handleShowDetail = () => {
+    navigation.navigate("MovieDetail");
+  };
+
+  const handleSearch = () => {
+    setSearch(query);
+  };
+
+  const handleGoToWatchList = () => {
+    navigation.navigate("WatchList");
+  };
 
   const itemStyles: ViewStyle = {
     flexWrap: "wrap",
@@ -55,34 +61,42 @@ export const Dashboard = ({ navigation }) => {
     handleFetch();
   }, []);
 
+  useEffect(() => {
+    if (query === "") {
+      setSearch("");
+    }
+  }, [query]);
+
   return (
     <Container>
       <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center" }}>
         <Search onPress={handleSearch} value={query} onChangeText={setQuery} viewStyle={searchStyles} />
 
-        <Pressable onPress={handlePrevPage}>
-          <Icon name="chevron-left" size={30} color="#900" />
-        </Pressable>
-        <Text style={{ color: "white" }}>{page}</Text>
-        <Pressable onPress={handleNextPage}>
-          <Icon name="chevron-right" size={30} color="#900" />
-        </Pressable>
+        <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center" }}>
+          <Pressable onPress={handleGoToWatchList} style={{ alignItems: "center" }}>
+            <Icon name="drink" size={24} color="white" />
+            <Text style={{ color: "white" }}>Watchlist</Text>
+          </Pressable>
 
-        <Pressable onPress={handleLogOut}>
-          <Icon name="network" size={30} color="white" />
-        </Pressable>
+          <Spacer space={12} isHorizontal={true} />
+
+          <Pressable onPress={handleLogOut} style={{ alignItems: "center" }}>
+            <Icon name="log-out" size={24} color="white" />
+            <Text style={{ color: "white" }}>Log out</Text>
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <View style={itemStyles}>
-          {data
-            .filter((item) => item.title !== undefined && item.title.toLowerCase().includes(query.toLowerCase()))
+          {movie
+            .filter((item) => item.title !== undefined && item.title.toLowerCase().includes(search !== "" ? search.toLowerCase() : ""))
             .map((item, index) => {
               const { title, poster_path } = item;
 
               const handleOpenItem = () => {
-                setShowDetail(true);
-                setSelectedItem(item);
+                handleUpdatedSelectedItem(item);
+                handleShowDetail();
               };
 
               return (
@@ -93,14 +107,6 @@ export const Dashboard = ({ navigation }) => {
             })}
         </View>
       </ScrollView>
-
-      {selectedItem !== undefined ? (
-        <Fragment>
-          <Modal isVisible={showDetail}>
-            <ShowDetails setVisible={handleCloseDetails} data={selectedItem} />
-          </Modal>
-        </Fragment>
-      ) : null}
     </Container>
   );
 };
