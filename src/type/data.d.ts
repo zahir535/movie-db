@@ -1,4 +1,4 @@
-interface IDataItem {
+declare interface IDataItem {
   adult: boolean;
   backdrop_path: string;
   genre_ids: number[];
@@ -13,5 +13,6 @@ interface IDataItem {
   vote_average: number;
   vote_count: number;
   popularity: number;
+  rating?: number;
   original_name?: undefined;
 }
