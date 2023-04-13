@@ -18,12 +18,17 @@ export const GeneralButton: FunctionComponent<IGeneralButton> = ({ label, onPres
     borderWidth: 1,
     borderRadius: 2,
     marginTop: 24,
+    minWidth: 280,
     flexDirection: "row",
+    borderColor: "white",
+    justifyContent: "center",
     ...viewStyle,
   };
 
   const labelStyle: TextStyle = {
-    color: "black",
+    // color: "white",
+    fontWeight: "400",
+    fontSize: 18,
     ...textStyle,
   };
 
