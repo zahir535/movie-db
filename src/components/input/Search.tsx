@@ -49,9 +49,10 @@ export const Search: FunctionComponent<ISearch> = ({
         spellCheck={false}
         style={inputTextStyle}
         value={value}
+        testID={"TextInput-dashboard"}
         {...props}
       />
-      <Pressable onPress={onPress}>
+      <Pressable onPress={onPress} testID={"Pressable-magnifying-glass"}>
         <Icon name="magnifying-glass" size={30} />
       </Pressable>
     </View>

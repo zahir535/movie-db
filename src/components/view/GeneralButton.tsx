@@ -1,5 +1,5 @@
 import React, { Fragment, FunctionComponent } from "react";
-import { Pressable, Text, TextStyle, ViewStyle } from "react-native";
+import { Pressable, PressableProps, Text, TextStyle, View, ViewStyle } from "react-native";
 import Icon from "react-native-vector-icons/Entypo";
 
 import { Spacer } from "./Spacer";
@@ -10,6 +10,7 @@ interface IGeneralButton {
   viewStyle?: ViewStyle;
   textStyle?: TextStyle;
   icon?: string;
+  props?: PressableProps & React.RefAttributes<View>;
 }
 
 export const GeneralButton: FunctionComponent<IGeneralButton> = ({ label, onPress, viewStyle, icon, textStyle }: IGeneralButton) => {
@@ -33,7 +34,7 @@ export const GeneralButton: FunctionComponent<IGeneralButton> = ({ label, onPres
   };
 
   return (
-    <Pressable style={buttonStyle} onPress={onPress}>
+    <Pressable style={buttonStyle} onPress={onPress} testID={"login-button"}>
       <Text style={labelStyle}>{label}</Text>
       {icon !== undefined ? (
         <Fragment>
